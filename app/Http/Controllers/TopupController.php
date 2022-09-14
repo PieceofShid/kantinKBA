@@ -25,29 +25,33 @@ class TopupController extends Controller
 
     public function post(Request $request)
     {
-
-        try{
-            $topup = Topup::create($request->all());
-
-            return $this->update($topup);
-        }catch(Exception $x){
-            return response()->json(['error'=> $x->getMessage()]);
-        }
-    }
-
-    public function update($topup)
-    {
-        $santri = Santri::find($topup->santri_id);
-        $saldo  = $santri->saldo + $topup->nominal;
+        $santri = Santri::find($request->santri_id);
+        $saldo  = $santri->saldo + $request->nominal;
 
         try{
             $santri->update([
                 'saldo' => $saldo
             ]);
 
+            return $this->update($request);
+        }catch(Exception $x){
+            return response()->json(['success'=> $x->getMessage()]);
+        }
+    }
+
+    public function update($request)
+    {
+        $santri = Santri::find($request->santri_id);
+
+        try{
+            Topup::create([
+                'nama' => $santri->nama,
+                'nominal' => $request->nominal
+            ]);
+
             return response()->json(['success'=> 'TOP UP BERHASIL SISA SALDO ANDA Rp. '.number_format($santri->saldo, 2, '.', '.')]);
         }catch(Exception $x){
-            return response()->json(['error'=> $x->getMessage()]);
+            return response()->json(['success'=> $x->getMessage()]);
         }
     }
 }

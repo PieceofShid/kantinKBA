@@ -62,13 +62,13 @@
               <span class="menu-title">Transaksi</span>
             </a>
           </li>
+          @if (auth()->user()->role_id == 1)
           <li class="nav-item">
             <a class="nav-link" href="{{ route('topup.create')}}">
               <i class="ti-money menu-icon"></i>
               <span class="menu-title">Topup</span>
             </a>
           </li>
-          @if (auth()->user()->role_id == 1)
           <li class="nav-item">
             <a class="nav-link" href="{{ route('santri.index')}}">
               <i class="ti-user menu-icon"></i>
@@ -114,6 +114,9 @@
   <script src="https://cdn.datatables.net/responsive/2.3.0/js/dataTables.responsive.min.js"></script>
   <script src="{{ asset('assets/script/dataTables.bootstrap4.js')}}"></script>
   <script src="{{ asset('assets/script/dataTables.select.min.js')}}"></script>
+  <script src="https://cdn.datatables.net/buttons/2.2.3/js/dataTables.buttons.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+  <script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.html5.min.js"></script>
   <script src="{{ asset('assets/script/select2.min.js')}}"></script>
 
   <!-- End plugin js for this page -->

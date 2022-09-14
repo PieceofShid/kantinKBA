@@ -25,27 +25,42 @@ class TransaksiController extends Controller
 
     public function post(Request $request)
     {
+        if($request->santri_id == 0){
+            return $this->update($request);
+        }
 
         try{
-            $transaksi = Transaksi::create($request->all());
-
-            return $this->update($transaksi);
+            $santri = Santri::find($request->santri_id);
+            $saldo  = $santri->saldo - $request->nominal;
+            $santri->update([
+                'saldo' => $saldo
+            ]);
+            
+            return $this->update($request);
         }catch(Exception $x){
             return response()->json(['error'=> $x->getMessage()]);
         }
     }
 
-    public function update($transaksi)
+    public function update($request)
     {
-        $santri = Santri::find($transaksi->santri_id);
-        $saldo  = $santri->saldo - $transaksi->nominal;
+        if($request->santri_id == 0){
+            $nama = 'Non-Santri';
+            $msg = 'TRANSAKSI BERHASIL';
+        }else{
+            $santri = Santri::find($request->santri_id);
+            $nama = $santri->nama;
+            $msg = 'TRANSAKSI BERHASIL SISA SALDO ANDA Rp. '.number_format($santri->saldo, 0, '.', '.');
+        }
 
         try{
-            $santri->update([
-                'saldo' => $saldo
+            $transaksi = Transaksi::create([
+                'nama' => $nama,
+                'nominal' => $request->nominal,
+                'deskripsi' => $request->deskripsi
             ]);
 
-            return response()->json(['success'=> 'TRANSAKSI BERHASIL SISA SALDO ANDA Rp. '.number_format($santri->saldo, 2)]);
+            return response()->json(['success'=> $msg]);
         }catch(Exception $x){
             return response()->json(['error'=> $x->getMessage()]);
         }

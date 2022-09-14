@@ -26,6 +26,7 @@
           <label for="santri_id">Santri</label>
           <select name="santri_id" id="santri_id" class="form-control" style="width: 100%" required>
             <option></option>
+            <option value="0">Non-Santri</option>
             @foreach ($santris as $santri)
               <option value="{{$santri->id}}">{{$santri->nama}}</option>
             @endforeach
@@ -80,8 +81,7 @@
 
 @section('script')
   <script>
-    var pin;
-    var saldo;
+    var pin, saldo, santri_id, nominal, deskripsi;
     $(document).ready(function(){
       $('#santri_id').select2({
         placeholder: "Pilih santri",
@@ -90,30 +90,35 @@
     })
 
     function valid(){
-      var santri_id = $('#santri_id').val();
-      var url = "{{ route('transaksi.check', ":santri_id")}}";
-      url = url.replace(':santri_id', santri_id);
-      $.ajax({
-        url: url,
-        method: 'GET',
-        success: function(data){
-          var nama = data['nama'];
-          pin  = data['pin'];
-          saldo = data['saldo'];
-          $('#nama_santri').html(nama);
-          $('#inputPIN').modal('show');
-        },error: function(){
-          alert('Terjadi kesalahan silahkan coba lagi nanti');
-        }
-      });
+      santri_id = $('#santri_id').val();
+      if(santri_id == 0){
+        validasi();
+      }else{
+        var url = "{{ route('transaksi.check', ":santri_id")}}";
+        url = url.replace(':santri_id', santri_id);
+        $.ajax({
+          url: url,
+          method: 'GET',
+          success: function(data){
+            var nama = data['nama'];
+            pin  = data['pin'];
+            saldo = data['saldo'];
+            $('#nama_santri').html(nama);
+            $('#inputPIN').modal('show');
+          },error: function(){
+            alert('Terjadi kesalahan silahkan coba lagi nanti');
+          }
+        });
+      }
     }
 
     function validasi(){
-      var santri_id = $('#santri_id').val();
-      var nominal = $('#nominal').val();
-      var deskripsi = $('#deskripsi').val();
+      nominal = $('#nominal').val();
+      deskripsi = $('#deskripsi').val();
 
-      if($('#santri_pin').val() != pin){
+      if (santri_id == 0){
+        postSubmit();
+      }else if($('#santri_pin').val() != pin){
         $('#berhasil').html('Nomor pin anda salah masukkan lagi');
         $('#inputPIN').modal('hide');
         $('#modalScs').modal('show');
@@ -122,7 +127,12 @@
         $('#inputPIN').modal('hide');
         $('#modalScs').modal('show');
       }else if($('#santri_pin').val() == pin && saldo > nominal){
-        $.ajaxSetup({
+        postSubmit()
+      }
+    }
+
+    function postSubmit(){
+      $.ajaxSetup({
           headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
           }
@@ -140,7 +150,6 @@
               alert(data.error);
            }
         });
-      }
     }
 
     function done(){

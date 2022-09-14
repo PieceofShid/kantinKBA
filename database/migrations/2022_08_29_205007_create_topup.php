@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('topups', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('santri_id')->references('id')->on('santris');
+            $table->string('nama');
             $table->integer('nominal');
             $table->timestamps();
         });
